@@ -1,5 +1,6 @@
-from PySide2.QtWidgets import QHBoxLayout, QLabel, QLineEdit, QMainWindow, QMessageBox, QPushButton, QVBoxLayout, QWidget, QSlider 
-from PySide2.QtCore import Qt 
+from PySide2.QtGui import QColor
+from PySide2.QtWidgets import QColorDialog, QHBoxLayout, QLabel, QLineEdit, QMainWindow, QMessageBox, QPushButton, QVBoxLayout, QWidget, QSlider 
+from PySide2.QtCore import Qt, Signal 
 from maya.OpenMaya import MVector
 import maya.OpenMayaUI as omui 
 import maya.mel as mel
@@ -8,7 +9,6 @@ import shiboken2
 def GetMayaMainWindow():
     mainWindow = omui.MQtUtil.mainWindow() 
     return shiboken2.wrapInstance(int(mainWindow), QMainWindow) 
-
 
 def DeleteWidgetWithNAme(name):
     for widget in GetMayaMainWindow().findChildren(QWidget, name):
@@ -31,9 +31,9 @@ class LimbRigger:
         self.mid = "" 
         self.end = "" 
         self.controllerSize = 5 
+        self.controllerColor = [0, 0, 0]
     def FindJointBasedOnSelection(self): 
         try:
-
             self.root = mc.ls(sl=True, type="joint")[0] 
             self.mid = mc.listRelatives(self.root, c=True, type="joint")[0] 
             self.end = mc.listRelatives(self.mid, c=True, type="joint")[0] 
@@ -123,12 +123,32 @@ class LimbRigger:
         mc.group([rootCtrlGrp, ikEndCtrlGrp, poleVectorCtrlGrp, ikfkBlendCtrlGrp], n=topGrpName)
         mc.parent(ikHandleName, ikEndCtrl)
 
+        mc.setAtt(topGrpName+".overrideEnabled", 1)
+        mc.setAtt(topGrpName+".overrideRGBColors", 1)
+        mc.setAtt(topGrpName+".overrideColorRGB", self.controllerColor[0], self.controller[1], self.controllerColor[2], type="double3")
+
+class ColorPicker(QWidget):
+    colorChanged = Signal(QColor)
+    def __init__(self):
+        super().__init__()
+        self.masterLayout = QVBoxLayout()
+        self.color = QColor()
+        self.setLayout(self.masterLayout)
+        self.pickColorBtn = QPushButton()
+        self.pickColorBtn.setStyleSheet(f"background-color:black")
+        self.pickColorBtn.clicked.connect(self.pickColorBtnClicked)
+        self.masterLayout.addWidget(self.pickColorBtn)
+
+    def pickColorBtnClicked(self):
+        self.color = QColorDialog.getColor()
+        self.pickColorBtn.setStyleSheet(f"background-color:{self.color.name()}")
+        self.colorChanged.emit(self.color)
+
 class LimbRiggerWidget(MayaWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Limb Rigger")
 
-        
         self.rigger = LimbRigger()
         self.masterLayout = QVBoxLayout()
         self.setLayout(self.masterLayout)
@@ -155,9 +175,22 @@ class LimbRiggerWidget(MayaWindow):
         ctrlSizeLayout.addWidget(self.ctrlSizeLabel)
         self.masterLayout.addLayout(ctrlSizeLayout)
 
+        colorPicker = ColorPicker()
+        colorPicker.colorChanged.connect(self.ColorPickerChanged)
+        self.masterLayout.addWidget(colorPicker)
+
+        rigLimbBtn = QPushButton("Rig Limb")
+        rigLimbBtn.clicked.connect(lambda : self.rigger.RigLimb())
+        self.masterLayout.addWidget(colorPicker)
+
         rigLimbBtn = QPushButton("Rig Limb")
         rigLimbBtn.clicked.connect(lambda : self.rigger.RigLimb())
         self.masterLayout.addWidget(rigLimbBtn)
+
+    def ColorPickerChanged(self, newColor: QColor):
+        self.rigger.controllerColor[0] = newColor.redF()
+        self.rigger.controllerColor[1] = newColor.greenF()
+        self.rigger.controllerColor[2] = newColor.blueF()
 
     def CtrlSizeSliderChanged(self, newValue):
         self.ctrlSizeLabel.setText(f"{newValue}")
