@@ -2,7 +2,7 @@
 
 ## Limb Rigger
 
-<img src="./assests/LimbRigger.PNG" width=400>
+<img src="./assets/LimbRigger.png" width=400>
 
 this plugin rigs any  3 joint limb with ik and fk and ikfk blend.
 
