@@ -147,7 +147,7 @@ class ColorPicker(QWidget):
 class LimbRiggerWidget(MayaWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Limb Rigger")
+        self.setWindowTitle("Limb Rigger v1.0.0")
 
         self.rigger = LimbRigger()
         self.masterLayout = QVBoxLayout()
