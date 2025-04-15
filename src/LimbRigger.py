@@ -1,14 +1,15 @@
-from PySide2.QtGui import QColor
-from PySide2.QtWidgets import QColorDialog, QHBoxLayout, QLabel, QLineEdit, QMainWindow, QMessageBox, QPushButton, QVBoxLayout, QWidget, QSlider 
-from PySide2.QtCore import Qt, Signal 
+from PySide2.QtWidgets import QHBoxLayout, QLabel, QLineEdit, QMainWindow, QMessageBox, QPushButton, QVBoxLayout, QWidget, QSlider, QColorDialog
+from PySide2.QtCore import Qt 
 from maya.OpenMaya import MVector
 import maya.OpenMayaUI as omui 
 import maya.mel as mel
 import shiboken2 
 
+
 def GetMayaMainWindow():
     mainWindow = omui.MQtUtil.mainWindow() 
     return shiboken2.wrapInstance(int(mainWindow), QMainWindow) 
+
 
 def DeleteWidgetWithNAme(name):
     for widget in GetMayaMainWindow().findChildren(QWidget, name):
@@ -31,9 +32,9 @@ class LimbRigger:
         self.mid = "" 
         self.end = "" 
         self.controllerSize = 5 
-        self.controllerColor = [0, 0, 0]
     def FindJointBasedOnSelection(self): 
         try:
+
             self.root = mc.ls(sl=True, type="joint")[0] 
             self.mid = mc.listRelatives(self.root, c=True, type="joint")[0] 
             self.end = mc.listRelatives(self.mid, c=True, type="joint")[0] 
@@ -110,7 +111,7 @@ class LimbRigger:
         mc.setAttr(ikfkBlendCtrlGrp+".t", rootJntLoc.x*2, rootJntLoc.y, rootJntLoc.z*2, typ="double3")
 
         ikfkBlendAttrName = "ikfkBlend"
-        mc.addAttr(ikfkBlendCtrl, ln=ikfkBlendAttrName, min = 0, max = 1, l=True)
+        mc.addAttr(ikfkBlendCtrl, ln=ikfkBlendAttrName, min = 0, max = 1, k=True)
         ikfkBlendAttr = ikfkBlendCtrl + "." + ikfkBlendAttrName
 
         mc.expression(s=f"{ikfkBlendAttrName}.ikBlend={ikfkBlendAttr}")
@@ -123,32 +124,12 @@ class LimbRigger:
         mc.group([rootCtrlGrp, ikEndCtrlGrp, poleVectorCtrlGrp, ikfkBlendCtrlGrp], n=topGrpName)
         mc.parent(ikHandleName, ikEndCtrl)
 
-        mc.setAtt(topGrpName+".overrideEnabled", 1)
-        mc.setAtt(topGrpName+".overrideRGBColors", 1)
-        mc.setAtt(topGrpName+".overrideColorRGB", self.controllerColor[0], self.controller[1], self.controllerColor[2], type="double3")
-
-class ColorPicker(QWidget):
-    colorChanged = Signal(QColor)
-    def __init__(self):
-        super().__init__()
-        self.masterLayout = QVBoxLayout()
-        self.color = QColor()
-        self.setLayout(self.masterLayout)
-        self.pickColorBtn = QPushButton()
-        self.pickColorBtn.setStyleSheet(f"background-color:black")
-        self.pickColorBtn.clicked.connect(self.pickColorBtnClicked)
-        self.masterLayout.addWidget(self.pickColorBtn)
-
-    def pickColorBtnClicked(self):
-        self.color = QColorDialog.getColor()
-        self.pickColorBtn.setStyleSheet(f"background-color:{self.color.name()}")
-        self.colorChanged.emit(self.color)
-
 class LimbRiggerWidget(MayaWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Limb Rigger v1.0.0")
+        self.setWindowTitle("Limb Rigger")
 
+        
         self.rigger = LimbRigger()
         self.masterLayout = QVBoxLayout()
         self.setLayout(self.masterLayout)
@@ -175,22 +156,20 @@ class LimbRiggerWidget(MayaWindow):
         ctrlSizeLayout.addWidget(self.ctrlSizeLabel)
         self.masterLayout.addLayout(ctrlSizeLayout)
 
-        colorPicker = ColorPicker()
-        colorPicker.colorChanged.connect(self.ColorPickerChanged)
-        self.masterLayout.addWidget(colorPicker)
-
-        rigLimbBtn = QPushButton("Rig Limb")
-        rigLimbBtn.clicked.connect(lambda : self.rigger.RigLimb())
-        self.masterLayout.addWidget(colorPicker)
-
         rigLimbBtn = QPushButton("Rig Limb")
         rigLimbBtn.clicked.connect(lambda : self.rigger.RigLimb())
         self.masterLayout.addWidget(rigLimbBtn)
+        self.SetColorBtn = QtWidgets.QPushButton("Set the Color")
+        self.SetColorBtn.clicked.connect(self.SetTheColor)
+        self.masterLayout.addWidget(self.SetColorBtn)
 
-    def ColorPickerChanged(self, newColor: QColor):
-        self.rigger.controllerColor[0] = newColor.redF()
-        self.rigger.controllerColor[1] = newColor.greenF()
-        self.rigger.controllerColor[2] = newColor.blueF()
+    def SetTheColor(self):
+        color = QColorDialog().getColor()
+        sel = mc.ls(sl=True)[0]
+        cmds.setAttr(sel + ".overrideEnabled", 1)
+        cmds.setAttr(sel + ".overrideRGBColors", 1)
+        cmds.setAttr(sel + ".overrideColorRGB", color.redF(), color.greenF(), color.blueF(), type="double3")
+
 
     def CtrlSizeSliderChanged(self, newValue):
         self.ctrlSizeLabel.setText(f"{newValue}")
@@ -242,6 +221,54 @@ def IndexToRgb(index):
         (1.0, 0.0, 1.0), (1.0, 0.0, 0.0), (0.0, 0.0, 1.0)]
     
     return colorTable[index] if index < len(colorTable) else (0.0, 0.0, 0.0)
+
+from PySide2 import QtWidgets, QtGui
+
+class ControllerColorSet(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Controller Color Set")
+        self.setFixedSize(300, 200)
+
+        self.selected_color = QtGui.QColor(255, 255, 255)
+        self.selected_controller = None
+
+        layout = QtWidgets.QVBoxLayout()
+
+        self.ControllerBtn = QtWidgets.QPushButton("Select the Controller")
+        self.ControllerBtn.clicked.connect(self.SelectController)
+        layout.addWidget(self.ControllerBtn)
+
+        self.ColorPickerBtn = QtWidgets.QPushButton("Choose the Color")
+        self.ColorPickerBtn.clicked.connect(self.OpenColorPicker)
+        layout.addWidget(self.ColorPickerBtntn)
+
+        self.SetColorBtn = QtWidgets.QPushButton("Set the Color")
+        self.SetColorBtn.clicked.connect(self.SetTheColor)
+        layout.addWidget(self.SetColorBtntn)
+
+        self.setLayout(layout)
+        print("ColorHello")
+
+    def SelectController(self):
+        self.selected_controller = self.controller_button
+        self.controller_button.setText("Controller Selected")
+
+    def OpenColorPicker(self):
+        color = QtWidgets.QColorDialog.getColor()
+        if color.isValid():
+            self.selected_color = color
+
+    def SetTheColor(self):
+        if self.selected_controller:
+            palette = self.selected_controller.palette()
+            palette.setColor(QtGui.QPalette.Button, self.selected_color)
+            self.selected_controller.setAutoFillBackground(True)
+            self.selected_controller.setPalette(palette)
+            self.selected_controller.update()
+        else:
+            QtWidgets.QMessageBox.warning(self, "No Controller", "Please select a controller first.")
+
 
 limbRiggerWidget = LimbRiggerWidget()
 limbRiggerWidget.show()
