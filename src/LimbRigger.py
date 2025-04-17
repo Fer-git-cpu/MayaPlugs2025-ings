@@ -1,31 +1,14 @@
-from PySide2.QtWidgets import QHBoxLayout, QLabel, QLineEdit, QMainWindow, QMessageBox, QPushButton, QVBoxLayout, QWidget, QSlider, QColorDialog
+import importlib
+import MayaUtilities
+importlib.reload(MayaUtilities)
+
+from MayaUtilities import MayaWindow
+from PySide2.QtWidgets import QHBoxLayout, QLabel, QLineEdit, QMessageBox, QPushButton, QVBoxLayout, QSlider, QColorDialog
 from PySide2.QtCore import Qt 
 from maya.OpenMaya import MVector
-import maya.OpenMayaUI as omui 
 import maya.mel as mel
-import shiboken2 
-
-
-def GetMayaMainWindow():
-    mainWindow = omui.MQtUtil.mainWindow() 
-    return shiboken2.wrapInstance(int(mainWindow), QMainWindow) 
-
-
-def DeleteWidgetWithNAme(name):
-    for widget in GetMayaMainWindow().findChildren(QWidget, name):
-        widget.deleteLater()
-
-class MayaWindow(QWidget):
-    def __init__(self): 
-        super().__init__(parent = GetMayaMainWindow())
-        DeleteWidgetWithNAme(self.GetWidgetuniqueName())
-        self.setWindowFlags(Qt.WindowType.Window)
-        self.setObjectName(self.GetWidgetuniqueName())
-    
-    def GetWidgetuniqueName(self):
-        return "dsfsdfssfsfsfsfsfsfsfsfsfs" 
-    
 import maya.cmds as mc 
+
 class LimbRigger: 
     def __init__(self): 
         self.root = "" 
@@ -273,5 +256,4 @@ class ControllerColorSet(QtWidgets.QWidget):
 limbRiggerWidget = LimbRiggerWidget()
 limbRiggerWidget.show()
 
-GetMayaMainWindow()
 ShowColorPickUI()
