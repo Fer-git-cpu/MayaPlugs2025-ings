@@ -13,12 +13,17 @@ this plugin rigs any  3 joint limb with ik and fk and ikfk blend.
 
 # Proxy Generator
 
-explain how it works
-what the tool does for now
-the classes, functions, and the logic behind the tool
+This imports all of the other functions that were made previously to create more space and for them to maturally connect to Maya.
+*Reloads = saves recent changes in Maya
+*MayaUtilities = Imports all functions
+*Qt Widgets = Builds UI's in Maya
 
 ```python
-for dupFace in allDupFaces:
-            if dupFace.replace(dup,"") not in faceNames:
-                facesToDelete.append(dupFace)
+import importlib
+import MayaUtilities
+importlib.reload(MayaUtilities)
+
+from MayaUtilities import *
+from PySide2.QtWidgets import QLabel, QVBoxLayout, QPushButton
+import maya.cmds as mc
 ```
