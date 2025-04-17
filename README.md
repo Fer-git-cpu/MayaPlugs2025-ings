@@ -32,14 +32,14 @@ This class is called ProxyGenerator, is a mesh based on skinning  data and joint
 * self.skin: stores the skin cluster influencing the mesh.
 * self.model: stores the name of the selected model (mesh).
 * self.jnts: stores joints influencing the skin.
-* skin = GetAllConnectionsIn(modelShape, GetUpperStream, IsSkin) = Connects the skin cluster upstream of the model's shape
-* jnts = GetAllConnectionsIn(modelShape, GetUpperStream, IsJoint) = Enables all joints influencing  the mesh through skin cluster.
-* modelShape = mc.listRelatives(self.model, s=True)[0] = Gets shape node of the model, necessary for connecting to deformation history
-* if not IsMesh(model) = if something else is selected that isn't a mesh, an error will appear
+* skin = GetAllConnectionsIn(modelShape, GetUpperStream, IsSkin) #Connects the skin cluster upstream of the model's shape
+* jnts = GetAllConnectionsIn(modelShape, GetUpperStream, IsJoint) #Enables all joints influencing  the mesh through skin cluster.
+* modelShape = mc.listRelatives(self.model, s=True)[0] #Gets shape node of the model, necessary for connecting to deformation history
+* if not IsMesh(model) #if something else is selected that isn't a mesh, an error will appear
 * model = mc.ls(sl=True)[0] = First selected object in the Maya Scene
-* print(f"found model {self.model} with skin {self.skin} and joins: {self.jnts}") = prints what's found
+* print(f"found model {self.model} with skin {self.skin} and joins: {self.jnts}") #prints what's found
 * for jnt, verts in jntVertDict.items():
-    newChunck = self.CreateProxyModelForJntAndVerts(jnt, verts) = Creates a proxy mesh for the part of the mesh of each joint it influences
+    newChunck = self.CreateProxyModelForJntAndVerts(jnt, verts) #Creates a proxy mesh for the part of the mesh of each joint it influences
 
 ```python
 class ProxyGenerator:
@@ -76,20 +76,20 @@ class ProxyGenerator:
             newChunck = self.CreateProxyModelForJntAndVerts(jnt, verts)
 ```
 * faces = mc.polyListComponentConversion(verts, fromVertex=True, toFace=True)
-faces = mc.ls(faces, fl=True) = Converts the list of vertices to their associated polygon faces.
+faces = mc.ls(faces, fl=True) #Converts the list of vertices to their associated polygon faces.
 * faceNames = set()
 for face in faces:
-    faceNames.add(face.replace(self.model, "")) = Removes the model prefix from each face name to get just the face indices and stores for compairison
-* dup = mc.duplicate(self.model)[0] = Duplicates the full model
+    faceNames.add(face.replace(self.model, "")) #Removes the model prefix from each face name to get just the face indices and stores for compairison
+* dup = mc.duplicate(self.model)[0] #Duplicates the full model
 * allDupFaces = mc.ls(f"{dup}.f[*]", fl=True)
 facesToDelete = []
 for dupFace in allDupFaces:
     if dupFace.replace(dup,"") not in faceNames:
-        facesToDelete.append(dupFace) = Collects all of the faces on the duplicate.
-* mc.delete(facesToDelete) = Deletes all of the faces that weren't in the original face set 
+        facesToDelete.append(dupFace) #Collects all of the faces on the duplicate.
+* mc.delete(facesToDelete) #Deletes all of the faces that weren't in the original face set 
 * dupName = self.model + "_" + jnt + "_proxy"
 mc.rename(dup, dupName)
-return dupName = Renames the remaining model
+return dupName #Renames the remaining model
 ```python
 def CreateProxyModelForJntAndVerts(self, jnt, verts):
         if not verts:
@@ -114,4 +114,36 @@ def CreateProxyModelForJntAndVerts(self, jnt, verts):
         dupName = self.model + "_" + jnt + "_proxy"
         mc.rename(dup, dupName)
         return dupName
+```
+* dict = {}
+for jnt in self.jnts:
+    dict[jnt] = [] #Creates a key for each joint from the self.jnts list with an empty list.
+* verts = mc.ls(f"{self.model}.vtx[*]", fl=True) #Gets all the vertices from the self.model and flattens the list.
+* for vert in verts:
+    owningJnt = self.GetJntWithMaxInfluence(vert, self.skin)
+    dict[owningJnt].append(vert) #Adds the vertex into the joint list in the dictionary.
+* return dict #Returns the last dictionary. Key = joint name. Value = list of verticles that influence the joint the most.
+```python
+ def GenerateJntVertsDict(self):
+        dict = {}
+        for jnt in self.jnts:
+            dict[jnt] = []
+
+        verts = mc.ls(f"{self.model}.vtx[*]", fl=True)
+        for vert in verts:
+            owningJnt = self.GetJntWithMaxInfluence(vert, self.skin)
+            dict[owningJnt].append(vert)
+        
+        return dict
+
+        weights = mc.skinPercent(skin, vert, q=True, v=True)
+        jnts = mc.skinPercent(skin, vert, q=True, t=None)
+        
+        maxWeightIndex = 0
+        maxWeight = weights[0]
+        for i in range(1, len(weights)):
+            if weights[i] > maxWeight:
+                maxWeight = weights[i]
+                maxWeightIndex = i
+            return jnts[maxWeightIndex]
 ```
