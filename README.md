@@ -17,8 +17,8 @@ explain how it works
 what the tool does for now
 the classes, functions, and the logic behind the tool
 
-'''python
+```python
 for dupFace in allDupFaces:
             if dupFace.replace(dup,"") not in faceNames:
                 facesToDelete.append(dupFace)
-'''
+```
