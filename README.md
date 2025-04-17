@@ -14,9 +14,9 @@ this plugin rigs any  3 joint limb with ik and fk and ikfk blend.
 # Proxy Generator
 
 This imports all of the other functions that were made previously to create more space and for them to maturally connect to Maya.
-*Reloads = saves recent changes in Maya
-*MayaUtilities = Imports all functions
-*Qt Widgets = Builds UI's in Maya
+* Reloads = saves recent changes in Maya
+* MayaUtilities = Imports all functions
+* Qt Widgets = Builds UI's in Maya
 
 ```python
 import importlib
