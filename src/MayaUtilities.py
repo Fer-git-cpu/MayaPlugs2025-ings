@@ -10,7 +10,7 @@ def IsMesh(obj):
         return False
     
     for s in shapes:
-        if mc.objectType("mesh"):
+        if mc.objectType(s)=="mesh":
             return True
         
     return False
@@ -37,17 +37,17 @@ def GetAllConnectionsIn(obj, nextFunc, filter = None):
         for next in nexts:
             allFound.add(next)
         
-        next = nextFunc(nexts)
+        nexts = nextFunc(nexts)
         if nexts:
             nexts = [x for x in nexts if x not in allFound]
-
+    print(f"found items: {allFound}")
     if not filter:
         return list(allFound)
     
     filtered = []
     for found in allFound:
         if filter(found):
-            filter.append(found)
+            filtered.append(found)
 
     return filtered
 
