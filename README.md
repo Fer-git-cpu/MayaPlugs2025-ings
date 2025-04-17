@@ -74,5 +74,44 @@ class ProxyGenerator:
         ctrls = []
         for jnt, verts in jntVertDict.items():
             newChunck = self.CreateProxyModelForJntAndVerts(jnt, verts)
+```
+* faces = mc.polyListComponentConversion(verts, fromVertex=True, toFace=True)
+faces = mc.ls(faces, fl=True) = Converts the list of vertices to their associated polygon faces.
+* faceNames = set()
+for face in faces:
+    faceNames.add(face.replace(self.model, "")) = Removes the model prefix from each face name to get just the face indices and stores for compairison
+* dup = mc.duplicate(self.model)[0] = Duplicates the full model
+* allDupFaces = mc.ls(f"{dup}.f[*]", fl=True)
+facesToDelete = []
+for dupFace in allDupFaces:
+    if dupFace.replace(dup,"") not in faceNames:
+        facesToDelete.append(dupFace) = Collects all of the faces on the duplicate.
+* mc.delete(facesToDelete) = Deletes all of the faces that weren't in the original face set 
+* dupName = self.model + "_" + jnt + "_proxy"
+mc.rename(dup, dupName)
+return dupName = Renames the remaining model
+```python
+def CreateProxyModelForJntAndVerts(self, jnt, verts):
+        if not verts:
+            return None
+        
+        faces = mc.polyListComponentConversion(verts, fromVertex=True, toFace=True)
+        faces = mc.ls(faces, fl=True)
 
+        faceNames = set()
+        for face in faces:
+            faceNames.add(face.replace(self.model, ""))
+
+        dup = mc.duplicate(self.model)[0]
+        allDupFaces = mc.ls(f"{dup}.f[*]", fl=True)
+        facesToDelete = []
+        for dupFace in allDupFaces:
+            if dupFace.replace(dup,"") not in faceNames:
+                facesToDelete.append(dupFace)
+
+        mc.delete(facesToDelete)
+
+        dupName = self.model + "_" + jnt + "_proxy"
+        mc.rename(dup, dupName)
+        return dupName
 ```
