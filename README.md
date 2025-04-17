@@ -34,6 +34,12 @@ This class is called ProxyGenerator, is a mesh based on skinning  data and joint
 * self.jnts: stores joints influencing the skin.
 * skin = GetAllConnectionsIn(modelShape, GetUpperStream, IsSkin) = Connects the skin cluster upstream of the model's shape
 * jnts = GetAllConnectionsIn(modelShape, GetUpperStream, IsJoint) = Enables all joints influencing  the mesh through skin cluster.
+* modelShape = mc.listRelatives(self.model, s=True)[0] = Gets shape node of the model, necessary for connecting to deformation history
+* if not IsMesh(model) = if something else is selected that isn't a mesh, an error will appear
+* model = mc.ls(sl=True)[0] = First selected object in the Maya Scene
+* print(f"found model {self.model} with skin {self.skin} and joins: {self.jnts}") = prints what's found
+* for jnt, verts in jntVertDict.items():
+    newChunck = self.CreateProxyModelForJntAndVerts(jnt, verts) = Creates a proxy mesh for the part of the mesh of each joint it influences
 
 ```python
 class ProxyGenerator:
