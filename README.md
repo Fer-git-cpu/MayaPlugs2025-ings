@@ -147,3 +147,36 @@ for jnt in self.jnts:
                 maxWeightIndex = i
             return jnts[maxWeightIndex]
 ```
+* class ProxyGeneratorWidget(MayaWindow): #Access UI class that inherits Maya's window.
+* def __init__(self):
+    super().__init__()
+    self.generator = ProxyGenerator() #Calls the parent constructor
+* self.masterLayout = QVBoxLayout() #Creats a vertical layout window in Maya when activated
+* self.setLayout(self.masterLayout) #Creates the main widget
+* self.masterLayout.addWidget(QLabel("Please select the rigged model, and press the build button")) #Creates and added a label with instructions for the user
+* buildBtn = QPushButton("Build") #Names the button "Build"
+* self.masterLayout.addWidget(buildBtn) #Add a button ladeled "Build"
+* buildBtn.clicked.connect(self.generator.BuildProxyForSelectedMesh) #This function does: detects the selected mesh in Maya, iterates over joints and vertices, and creates proxy meshes per joint.
+* self.setWindowTitle("Proxy Generator") #Creates the title of the window
+* def GetWidgetuniqueName(self):
+    return "ProxyGeneratorJL4154151415" #Returns a unique identifier for the UI
+
+```python
+class ProxyGeneratorWidget(MayaWindow):
+    def __init__(self):
+        super().__init__()
+        self.generator = ProxyGenerator()
+        self.masterLayout = QVBoxLayout()
+        self.setLayout(self.masterLayout)
+
+        self.masterLayout.addWidget(QLabel("Please select the rigged model, and press the build button"))
+        buildBtn = QPushButton("Build")
+        self.masterLayout.addWidget(buildBtn)
+        buildBtn.clicked.connect(self.generator.BuildProxyForSelectedMesh)
+        self.setWindowTitle("Proxy Generator")
+
+    def GetWidgetuniqueName(self):
+        return "ProxyGeneratorJL4154151415"
+    
+ProxyGeneratorWidget().show()
+```
