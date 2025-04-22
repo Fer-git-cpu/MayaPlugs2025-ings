@@ -121,8 +121,9 @@ class ProxyGenerator:
             if weights[i] > maxWeight:
                 maxWeight = weights[i]
                 maxWeightIndex = i
-                
+
         return jnts[maxWeightIndex]
+
 
 
 class ProxyGeneratorWidget(MayaWindow):
@@ -142,3 +143,4 @@ class ProxyGeneratorWidget(MayaWindow):
         return "ProxyGeneratorJL4154151415"
     
 ProxyGeneratorWidget().show()
+
