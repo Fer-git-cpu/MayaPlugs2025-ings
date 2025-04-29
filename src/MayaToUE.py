@@ -3,6 +3,7 @@ from PySide2.QtCore import Signal
 from PySide2.QtGui import QIntValidator, QRegExpValidator
 from PySide2.QtWidgets import QCheckBox, QFileDialog, QHBoxLayout, QLabel, QLineEdit, QListWidget, QMessageBox, QPushButton, QVBoxLayout
 import maya.cmds as mc
+import os
 
 def TryAction(actionFunc):
     def wrapper(*args, **kwargs):
@@ -49,7 +50,7 @@ class MayaToUE:
         # -f means the file name, -s means export selected, -ea means export animation
         mc.FBXExport('-f', skeletalMeshExportPath, '-s', True, '-ea', False)
         if self.animations:
-            mc.FBXExportBakeComplexAnimations('-v', True)
+            mc.FBXExportBakeComplexAnimation('-v', True)
             os.makedirs(os.path.join(self.saveDir, "animations"), exist_ok=True)
 
             for animClip in self.animations:
@@ -128,7 +129,7 @@ class MayaToUE:
 
 class AnimClipWidget(QWidget):
     animClipRemoved = Signal(AnimClip)
-    animClipSubfixChange = Signal
+    animClipSubfixChange = Signal(str)
     def __init__(self, animClip: AnimClip):
         super().__init__()
         self.animClip = animClip
