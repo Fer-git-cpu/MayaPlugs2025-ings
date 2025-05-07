@@ -3,7 +3,7 @@ import MayaUtilities
 importlib.reload(MayaUtilities)
 
 from MayaUtilities import *
-from PySide2.QtWidgets import QLabel, QVBoxLayout, QPushButton
+from PySide6.QtWidgets import QLabel, QVBoxLayout, QPushButton
 import maya.cmds as mc
 
 class ProxyGenerator:

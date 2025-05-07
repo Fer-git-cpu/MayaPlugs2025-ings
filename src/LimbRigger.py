@@ -3,8 +3,8 @@ import MayaUtilities
 importlib.reload(MayaUtilities)
 
 from MayaUtilities import MayaWindow
-from PySide2.QtWidgets import QHBoxLayout, QLabel, QLineEdit, QMessageBox, QPushButton, QVBoxLayout, QSlider, QColorDialog
-from PySide2.QtCore import Qt 
+from PySide6.QtWidgets import QHBoxLayout, QLabel, QLineEdit, QMessageBox, QPushButton, QVBoxLayout, QSlider, QColorDialog
+from PySide6.QtCore import Qt 
 from maya.OpenMaya import MVector
 import maya.mel as mel
 import maya.cmds as mc 
@@ -205,7 +205,7 @@ def IndexToRgb(index):
     
     return colorTable[index] if index < len(colorTable) else (0.0, 0.0, 0.0)
 
-from PySide2 import QtWidgets, QtGui
+from PySide6 import QtWidgets, QtGui
 
 class ControllerColorSet(QtWidgets.QWidget):
     def __init__(self):

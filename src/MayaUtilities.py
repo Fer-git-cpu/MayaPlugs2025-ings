@@ -1,7 +1,7 @@
-from PySide2.QtWidgets import QMainWindow, QWidget
-from PySide2.QtCore import Qt 
+from PySide6.QtWidgets import QMainWindow, QWidget
+from PySide6.QtCore import Qt 
 import maya.OpenMayaUI as omui 
-import shiboken2 
+import shiboken6
 import maya.cmds as mc
 
 def IsMesh(obj):
@@ -53,7 +53,7 @@ def GetAllConnectionsIn(obj, nextFunc, filter = None):
 
 def GetMayaMainWindow():
     mainWindow = omui.MQtUtil.mainWindow() 
-    return shiboken2.wrapInstance(int(mainWindow), QMainWindow) 
+    return shiboken6.wrapInstance(int(mainWindow), QMainWindow) 
 
 
 def DeleteWidgetWithNAme(name):

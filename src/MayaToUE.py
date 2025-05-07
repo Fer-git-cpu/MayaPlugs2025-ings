@@ -4,6 +4,8 @@ from PySide2.QtGui import QIntValidator, QRegExpValidator
 from PySide2.QtWidgets import QCheckBox, QFileDialog, QHBoxLayout, QLabel, QLineEdit, QListWidget, QMessageBox, QPushButton, QVBoxLayout
 import maya.cmds as mc
 import os
+import MayaPlugs2025
+import remote_execution
 
 def TryAction(actionFunc):
     def wrapper(*args, **kwargs):
@@ -70,7 +72,27 @@ class MayaToUE:
                 
                 mc.FBXExport('-f', animExportPath, "-s", True, '-ea', True)
 
+        ueUtilPath = os.path.join(MayaPlugs2025.srcDir, "UnrealUtilities.py")
+        ueUtilPath = os.path.normpath(ueUtilPath)
+
     
+        meshPath = self.GetSkeletalMeshSavePath().replace("\\", "/")
+        aimDir = os.path.join(self.saveDir, "animations").replace("\\", "/")
+
+        commandLines = []
+        with open(ueUtilPath, "r") as ueUtilityFile:
+            commandLines = ueUtilityFile.readlines()
+
+        commandLines.append(f"\nImportMeshAndAnimations(\'{meshPath}\', \'{aimDir}\')")
+
+        command = "".join(commandLines)
+        print(command)
+
+        remoteExec = remote_execution.RemoteExecution()
+        remoteExec.start()
+        remoteExec.open_command_connection(remoteExec.remote_nodes)
+        remoteExec.run_command(command)
+        remoteExec.stop()
 
     def GetSkeletalMeshSavePath(self):
         savePath = os.path.join(self.saveDir, self.fileName + ".fbx")
@@ -162,7 +184,7 @@ class AnimClipWidget(QWidget):
         self.masterLayout.addWidget(maxFrameLabel)
         maxFrameLineEdit = QLineEdit()
         maxFrameLineEdit.setValidator(QIntValidator())
-        maxFrameLineEdit.setText(str(int(self.animClip.frameMin)))
+        maxFrameLineEdit.setText(str(int(self.animClip.frameMax)))
         maxFrameLineEdit.textChanged.connect(self.MaxFrameChanged)
         self.masterLayout.addWidget(maxFrameLineEdit)
 
@@ -186,7 +208,7 @@ class AnimClipWidget(QWidget):
          self.animClip.frameMin = int(newVal)
 
     def MaxFrameChanged(self, newVal):
-         self.animClip.frameMin = int(newVal)
+         self.animClip.frameMax = int(newVal)
 
     def SubfixTextChanged(self, newText):
          self.animClip.subfix = newText

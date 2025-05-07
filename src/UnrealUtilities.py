@@ -54,4 +54,4 @@ def ImportMeshAndAnimations(meshPath, animDir):
         animPath = os.path.join(animDir, file)
         ImportAnimation(mesh, animPath)
 
-ImportMeshAndAnimations("D:/profile redirect/fecasti1/OneDrive - University of the Incarnate Word/Desktop/alex.fbx", "D:/profile redirect/fecasti1/OneDrive - University of the Incarnate Word/Desktop/animations")
+#ImportMeshAndAnimations("D:/profile redirect/fecasti1/OneDrive - University of the Incarnate Word/Desktop/alex.fbx", "D:/profile redirect/fecasti1/OneDrive - University of the Incarnate Word/Desktop/animations")
