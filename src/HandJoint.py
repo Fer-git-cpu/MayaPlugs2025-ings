@@ -58,28 +58,28 @@ class AutoHandRigBuilder:
     def build(self):
         rig_grp = cmds.group(empty=True, name="hand_rig_grp")
 
-        # Create wrist control
+        
         wrist_ctrl = cmds.circle(name="wrist_ctrl", normal=[1, 0, 0], radius=1.5)[0]
         wrist_grp = cmds.group(wrist_ctrl, name="wrist_ctrl_grp")
         cmds.delete(cmds.parentConstraint(self.wrist_joint, wrist_grp))
         cmds.orientConstraint(wrist_ctrl, self.wrist_joint, maintainOffset=True)
         cmds.parent(wrist_grp, rig_grp)
 
-        # Create finger chains and controls
+        
         for finger_name, offsets in self.finger_data.items():
             finger_joints = self.create_finger_chain(offsets, finger_name)
             cmds.parent(finger_joints[0], self.wrist_joint)
             ctrls = self.create_fk_controls(finger_joints)
             self.all_controls.extend(ctrls)
 
-            # Parent first control group under wrist control
+            
             ctrl_grp = ctrls[0] + "_grp"
             cmds.parent(ctrl_grp, wrist_ctrl)
 
-        print("✅ Full FK hand rig created successfully.")
+        print("Full FK hand rig created successfully.")
 
 
-def auto_create_hand_rig():
+def AutoMakeHandRig():
     selection = cmds.ls(selection=True)
     if not selection:
         cmds.warning("Please select the wrist joint.")
@@ -89,6 +89,4 @@ def auto_create_hand_rig():
         rig.build()
     except Exception as e:
         cmds.warning(str(e))
-
-# After selecting the wrist joint, run:
-auto_create_hand_rig()
+AutoMakeHandRig()
