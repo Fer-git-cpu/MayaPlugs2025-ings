@@ -12,7 +12,7 @@ import maya.cmds as cmds
 
 import maya.cmds as cmds
 
-class AutoHandRigBuilder:
+class HandRigger:
     def __init__(self, wristJoint):
         if not cmds.objExists(wristJoint) or not cmds.objectType(wristJoint, isType='joint'):
             raise ValueError("Please select a valid wrist joint.")
