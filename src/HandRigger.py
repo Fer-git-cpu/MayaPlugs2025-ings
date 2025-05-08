@@ -84,7 +84,7 @@ def AutoMakeHandRig():
         cmds.warning("Please select the wrist joint.")
         return
     try:
-        rig = AutoHandRigBuilder(selection[0])
+        rig = HandRigger(selection[0])
         rig.build()
     except Exception as e:
         cmds.warning(str(e))
