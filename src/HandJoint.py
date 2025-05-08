@@ -13,11 +13,11 @@ import maya.cmds as cmds
 import maya.cmds as cmds
 
 class AutoHandRigBuilder:
-    def __init__(self, wrist_joint):
-        if not cmds.objExists(wrist_joint) or not cmds.objectType(wrist_joint, isType='joint'):
+    def __init__(self, wristJoint):
+        if not cmds.objExists(wristJoint) or not cmds.objectType(wristJoint, isType='joint'):
             raise ValueError("Please select a valid wrist joint.")
 
-        self.wristJoint = wrist_joint
+        self.wristJoint = wristJoint
         self.finger_data = {
             'thumb': [[2, 0, 1], [3, 0, 2], [4, 0, 2.5]],
             'index': [[1, 0, -1], [2, 0, -2], [3, 0, -3]],
@@ -65,15 +65,15 @@ class AutoHandRigBuilder:
         cmds.parent(wristGrp, rig_grp)
 
         
-        for finger_name, offsets in self.finger_data.items():
-            finger_joints = self.makeFingerChain(offsets, finger_name)
-            cmds.parent(finger_joints[0], self.wristJoint)
-            ctrls = self.create_fk_controls(finger_joints)
+        for fingerName, offsets in self.finger_data.items():
+            fingerJoints = self.makeFingerChain(offsets, fingerName)
+            cmds.parent(fingerJoints[0], self.wristJoint)
+            ctrls = self.create_fk_controls(fingerJoints)
             self.allControls.extend(ctrls)
 
             
-            ctrl_grp = ctrls[0] + "_grp"
-            cmds.parent(ctrl_grp, wristCtrl)
+            ctrlGrp = ctrls[0] + "_grp"
+            cmds.parent(ctrlGrp, wristCtrl)
 
         print("Full FK hand rig created successfully.")
 
