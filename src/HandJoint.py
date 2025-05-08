@@ -55,14 +55,14 @@ class AutoHandRigBuilder:
         return controls
 
     def build(self):
-        rig_grp = cmds.group(empty=True, name="hand_rig_grp")
+        rigGrp = cmds.group(empty=True, name="hand_rig_grp")
 
         
         wristCtrl = cmds.circle(name="wris_ctrl", normal=[1, 0, 0], radius=1.5)[0]
         wristGrp = cmds.group(wristCtrl, name="wrist_ctrl_grp")
         cmds.delete(cmds.parentConstraint(self.wristJoint, wristGrp))
         cmds.orientConstraint(wristCtrl, self.wristJoint, maintainOffset=True)
-        cmds.parent(wristGrp, rig_grp)
+        cmds.parent(wristGrp, rigGrp)
 
         
         for fingerName, offsets in self.finger_data.items():
