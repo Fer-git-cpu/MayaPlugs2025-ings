@@ -1,8 +1,8 @@
 # My Maya Plugins
 
-# HandJoint
+# HandRigger
 
-<img src=".Users/ferna/OneDrive/Pictures/Screenshots/HandRigger.png" width=400>
+<img src="./assets/HandRigger.png" width=400>
 
 What it does:
 
